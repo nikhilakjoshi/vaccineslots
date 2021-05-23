@@ -1,6 +1,7 @@
 import React, { useEffect, useCallback, useReducer } from "react";
 import "./App.css";
 import ruppee from "./ruppee.svg";
+import git from "./git.svg";
 import clsx from "clsx";
 
 const initialState = {
@@ -65,57 +66,61 @@ const reducer = (currState: any, action: any) => {
 
 const Slots: React.FC<any> = ({ state, isLoading }) => {
   return isLoading ? (
-    <div className="loader">Loading Data. Please wait</div>
+    <div className="loader text-gray-300">Loading Data. Please wait</div>
   ) : (
-    <main className="bg-gray-700 text-left p-4 overflow-y-auto">
-      <div className="text-3xl font-bold text-gray-400 border-b-2 pb-1 mb-3 border-gray-600">
-        {state.name}
-      </div>
-      <div className="centers">
-        {state && state.centers && state.centers.length > 0 ? (
-          state.centers.map((center: any, index: any) => (
-            <div key={index} className="my-8">
-              <div className="font-bold flex items-center justify-between text-xl text-gray-300 underline">
-                {center.name}
-                {center.fee_type == "Paid" ? (
-                  <img className="h-6" src={ruppee} />
-                ) : null}
-              </div>
-              <div className="mb-4 text-sm text-gray-400 address">
-                {center.address}
-              </div>
-              {center.sessions &&
-                center.sessions.map((session: any, ind: any) => (
-                  <div
-                    key={ind}
-                    className="slotwrap bg-gray-900 text-gray-50 p-4 drop-shadow-sm"
-                  >
-                    <div className="flex mb-2 items-center">
-                      <div className="date underline text-gray-100">
-                        Date: {session.date}
+    <div className="medwrap md:max-w-5xl mx-auto text-left">
+      <main className="bg-gray-700 text-left p-4 overflow-y-auto">
+        <div className="text-3xl font-bold text-gray-400 border-b-2 pb-1 mb-3 border-gray-600">
+          {state.name}
+        </div>
+        <div className="centers">
+          {state && state.centers && state.centers.length > 0 ? (
+            state.centers.map((center: any, index: any) => (
+              <div key={index} className="my-8">
+                <div className="font-bold flex items-center justify-between text-xl text-gray-300 underline">
+                  {center.name}
+                  {center.fee_type == "Paid" ? (
+                    <img className="h-6" src={ruppee} />
+                  ) : null}
+                </div>
+                <div className="mb-4 text-sm text-gray-400 address">
+                  {center.address}
+                </div>
+                {center.sessions &&
+                  center.sessions.map((session: any, ind: any) => (
+                    <div
+                      key={ind}
+                      className="slotwrap bg-gray-900 text-gray-50 p-4 drop-shadow-sm"
+                    >
+                      <div className="flex mb-2 items-center">
+                        <div className="date underline text-gray-100">
+                          Date: {session.date}
+                        </div>
+                        <div className="vaccine ml-auto text-sm tracking-widest bg-gray-300 text-green-900 flex items-center px-1 rounded font-bold">
+                          {session.vaccine}
+                        </div>
                       </div>
-                      <div className="vaccine ml-auto text-sm tracking-widest bg-gray-300 text-green-900 flex items-center px-1 rounded font-bold">
-                        {session.vaccine}
+                      <div className="age ml-4">
+                        Age: {session.min_age_limit}
+                      </div>
+                      <div className="dose1 ml-8">
+                        Dose 1: {session.available_capacity_dose1}
+                      </div>
+                      <div className="dose2 ml-8">
+                        Dose 2: {session.available_capacity_dose2}
                       </div>
                     </div>
-                    <div className="age ml-4">Age: {session.min_age_limit}</div>
-                    <div className="dose1 ml-8">
-                      Dose 1: {session.available_capacity_dose1}
-                    </div>
-                    <div className="dose2 ml-8">
-                      Dose 2: {session.available_capacity_dose2}
-                    </div>
-                  </div>
-                ))}
+                  ))}
+              </div>
+            ))
+          ) : (
+            <div className="noslots text-gray-400 italic">
+              No slots available for 18 +
             </div>
-          ))
-        ) : (
-          <div className="noslots text-gray-400 italic">
-            No slots available for 18 +
-          </div>
-        )}
-      </div>
-    </main>
+          )}
+        </div>
+      </main>
+    </div>
   );
 };
 
@@ -241,7 +246,9 @@ function App() {
     );
 
     Promise.all(prom).then(() => {
-      dispatch({ type: "setLoading", payload: false });
+      setTimeout(() => {
+        dispatch({ type: "setLoading", payload: false });
+      }, 500);
     });
   }, []);
 
@@ -250,31 +257,45 @@ function App() {
   }, []);
 
   return (
-    <div className="App">
-      <header className="bg-gray-900 font-bold text-gray-400 text-xl h-16 flex justify-start px-4 items-center border-gray-400 border-b">
-        Vaccination slots
+    <div className="App mx-auto">
+      <header className="bg-gray-900 sticky top-0 w-full font-bold text-gray-400 text-xl h-16 flex justify-start items-center border-gray-400 border-b">
+        <div className="medwrap bg-gray-900 md:max-w-5xl w-full mx-auto text-left">
+          <div className="toproot flex justify-between items-center">
+            <h6>Vaccination slots</h6>
+            <div className="icos">
+              <a
+                href="https://github.com/nikhilakjoshi/vaccineslots"
+                target="_blank"
+              >
+                <img src={git} alt="git" />
+              </a>
+            </div>
+          </div>
+        </div>
       </header>
-      <div className="wrap">
-        <div className="tabroot bg-gray-700 items-center flex gap-4 p-4">
-          {["BBMP", "Gulbarga", "Chennai", "Hyderabad"].map((d) => (
+      <div className="wrap bg-gray-700">
+        <div className="medwrap md:max-w-5xl mx-auto text-left overflow-y-auto">
+          <div className="tabroot bg-gray-700 items-center flex gap-4 p-4">
+            {["BBMP", "Gulbarga", "Chennai", "Hyderabad"].map((d) => (
+              <button
+                key={d}
+                className={clsx({
+                  ["focus:outline-none hover:text-gray-100 text-gray-400 text-sm"]:
+                    true,
+                  ["underline"]: states.activeWard == d,
+                })}
+                onClick={() => dispatch({ type: "setactiveward", payload: d })}
+              >
+                {d}
+              </button>
+            ))}
             <button
-              key={d}
-              className={clsx({
-                ["focus:outline-none hover:text-gray-100 text-gray-400 text-sm"]:
-                  true,
-                ["underline"]: states.activeWard == d,
-              })}
-              onClick={() => dispatch({ type: "setactiveward", payload: d })}
+              className="focus:outline-none hover:text-gray-100 text-gray-400 text-sm ml-auto"
+              onClick={() => LoadData()}
             >
-              {d}
+              Refresh
             </button>
-          ))}
-          <button
-            className="focus:outline-none hover:text-gray-100 text-gray-400 text-sm ml-auto"
-            onClick={() => LoadData()}
-          >
-            Refresh
-          </button>
+          </div>
         </div>
         {getActiveComp(states)}
       </div>
