@@ -259,7 +259,7 @@ function App() {
   return (
     <div className="App mx-auto">
       <header className="bg-gray-900 sticky top-0 w-full font-bold text-gray-400 text-xl h-16 flex justify-start items-center border-gray-400 border-b">
-        <div className="medwrap bg-gray-900 md:max-w-5xl w-full mx-auto text-left">
+        <div className="medwrap bg-gray-900 md:max-w-5xl w-full mx-auto text-left px-4">
           <div className="toproot flex justify-between items-center">
             <h6>Vaccination slots</h6>
             <div className="icos">
