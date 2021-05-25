@@ -17,33 +17,113 @@ const initialState = {
     name: "Chennai",
     centers: [],
   },
+  Pune: {
+    name: "Pune",
+    centers: [],
+  },
+  Mumbai: {
+    name: "Mumbai",
+    centers: [],
+  },
+  Thane: {
+    name: "Thane",
+    centers: [],
+  },
   activeWard: "BBMP",
   isLoading: true,
+  activeFilter: "all",
 };
 const reducer = (currState: any, action: any) => {
   switch (action.type) {
     case "setglb": {
       return {
         ...currState,
-        Gulbarga: { name: "Gulbarga", centers: [...action.payload] },
+        Gulbarga: {
+          name: "Gulbarga",
+          centers: [...action.payload],
+          centers18A: [...action.payload18Dose1],
+          centers18B: [...action.payload18Dose2],
+          centers45A: [...action.payload45Dose1],
+          centers45B: [...action.payload45Dose2],
+        },
       };
     }
     case "setbbmp": {
       return {
         ...currState,
-        BBMP: { name: "BBMP", centers: [...action.payload] },
+        BBMP: {
+          name: "BBMP",
+          centers: [...action.payload],
+          centers18A: [...action.payload18Dose1],
+          centers18B: [...action.payload18Dose2],
+          centers45A: [...action.payload45Dose1],
+          centers45B: [...action.payload45Dose2],
+        },
       };
     }
     case "setchennai": {
       return {
         ...currState,
-        Chennai: { name: "Chennai", centers: [...action.payload] },
+        Chennai: {
+          name: "Chennai",
+          centers: [...action.payload],
+          centers18A: [...action.payload18Dose1],
+          centers18B: [...action.payload18Dose2],
+          centers45A: [...action.payload45Dose1],
+          centers45B: [...action.payload45Dose2],
+        },
       };
     }
     case "sethyderabad": {
       return {
         ...currState,
-        Hyderabad: { name: "Hyderabad", centers: [...action.payload] },
+        Hyderabad: {
+          name: "Hyderabad",
+          centers: [...action.payload],
+          centers18A: [...action.payload18Dose1],
+          centers18B: [...action.payload18Dose2],
+          centers45A: [...action.payload45Dose1],
+          centers45B: [...action.payload45Dose2],
+        },
+      };
+    }
+    case "setPune": {
+      return {
+        ...currState,
+        Pune: {
+          name: "Pune",
+          centers: [...action.payload],
+          centers18A: [...action.payload18Dose1],
+          centers18B: [...action.payload18Dose2],
+          centers45A: [...action.payload45Dose1],
+          centers45B: [...action.payload45Dose2],
+        },
+      };
+    }
+    case "setMumbai": {
+      return {
+        ...currState,
+        Mumbai: {
+          name: "Mumbai",
+          centers: [...action.payload],
+          centers18A: [...action.payload18Dose1],
+          centers18B: [...action.payload18Dose2],
+          centers45A: [...action.payload45Dose1],
+          centers45B: [...action.payload45Dose2],
+        },
+      };
+    }
+    case "setThane": {
+      return {
+        ...currState,
+        Thane: {
+          name: "Thane",
+          centers: [...action.payload],
+          centers18A: [...action.payload18Dose1],
+          centers18B: [...action.payload18Dose2],
+          centers45A: [...action.payload45Dose1],
+          centers45B: [...action.payload45Dose2],
+        },
       };
     }
     case "setactiveward": {
@@ -58,6 +138,12 @@ const reducer = (currState: any, action: any) => {
         isLoading: action.payload,
       };
     }
+    case "setfilter": {
+      return {
+        ...currState,
+        activeFilter: action.payload,
+      };
+    }
 
     default:
       return currState;
@@ -69,8 +155,8 @@ const Slots: React.FC<any> = ({ state, isLoading }) => {
     <div className="loader text-gray-300">Loading Data. Please wait</div>
   ) : (
     <div className="medwrap md:max-w-5xl mx-auto text-left">
-      <main className="bg-gray-700 text-left p-4 overflow-y-auto">
-        <div className="text-3xl font-bold text-gray-400 border-b-2 pb-1 mb-3 border-gray-600">
+      <main className="bg-gray-700 text-left px-4 my-4 overflow-y-auto">
+        <div className="text-3xl font-bold sticky top-0 bg-gray-700 text-gray-400 border-b-2 pb-1 mb-3 border-gray-600">
           {state.name}
         </div>
         <div className="centers">
@@ -104,10 +190,26 @@ const Slots: React.FC<any> = ({ state, isLoading }) => {
                         Age: {session.min_age_limit}
                       </div>
                       <div className="dose1 ml-8">
-                        Dose 1: {session.available_capacity_dose1}
+                        Dose 1:{" "}
+                        <span
+                          className={clsx({
+                            ["text-green-400"]:
+                              session.available_capacity_dose1 > 0,
+                          })}
+                        >
+                          {session.available_capacity_dose1}
+                        </span>
                       </div>
-                      <div className="dose2 ml-8">
-                        Dose 2: {session.available_capacity_dose2}
+                      <div className="dose1 ml-8">
+                        Dose 2:{" "}
+                        <span
+                          className={clsx({
+                            ["text-green-400"]:
+                              session.available_capacity_dose2 > 0,
+                          })}
+                        >
+                          {session.available_capacity_dose2}
+                        </span>
                       </div>
                     </div>
                   ))}
@@ -115,7 +217,7 @@ const Slots: React.FC<any> = ({ state, isLoading }) => {
             ))
           ) : (
             <div className="noslots text-gray-400 italic">
-              No slots available for 18 +
+              No slots available for selected filter
             </div>
           )}
         </div>
@@ -126,14 +228,25 @@ const Slots: React.FC<any> = ({ state, isLoading }) => {
 
 const getActiveComp = (state: any) => {
   switch (state.activeWard) {
-    case "BBMP":
-      return <Slots state={state.BBMP} isLoading={state.isLoading} />;
-    case "Gulbarga":
-      return <Slots state={state.Gulbarga} isLoading={state.isLoading} />;
-    case "Chennai":
-      return <Slots state={state.Chennai} isLoading={state.isLoading} />;
-    case "Hyderabad":
-      return <Slots state={state.Hyderabad} isLoading={state.isLoading} />;
+    default:
+      return (
+        <Slots
+          state={{
+            ...state[state.activeWard],
+            centers:
+              state.activeFilter == "all"
+                ? state[state.activeWard].centers
+                : state.activeFilter == "18A"
+                ? state[state.activeWard].centers18A
+                : state.activeFilter == "18B"
+                ? state[state.activeWard].centers18B
+                : state.activeFilter == "45A"
+                ? state[state.activeWard].centers45A
+                : state[state.activeWard].centers45B,
+          }}
+          isLoading={state.isLoading}
+        />
+      );
   }
 };
 
@@ -142,13 +255,43 @@ function App() {
 
   const LoadData = useCallback(() => {
     dispatch({ type: "setLoading", payload: true });
+    const loadinfo = [
+      {
+        district_id: 267,
+        dispatchType: "setglb",
+      },
+      {
+        district_id: 294,
+        dispatchType: "setbbmp",
+      },
+      {
+        district_id: 571,
+        dispatchType: "setchennai",
+      },
+      {
+        district_id: 581,
+        dispatchType: "sethyderabad",
+      },
+      {
+        district_id: 363,
+        dispatchType: "setPune",
+      },
+      {
+        district_id: 395,
+        dispatchType: "setMumbai",
+      },
+      {
+        district_id: 392,
+        dispatchType: "setThane",
+      },
+    ];
 
-    let prom: any = [];
-
-    prom.push(
-      new Promise((res) => {
+    let prom: any = loadinfo.map((dist) => {
+      return new Promise((res) => {
         fetch(
-          `https://cdn-api.co-vin.in/api/v2/appointment/sessions/public/calendarByDistrict?district_id=267&date=${new Date().getDate()}-${
+          `https://cdn-api.co-vin.in/api/v2/appointment/sessions/public/calendarByDistrict?district_id=${
+            dist.district_id
+          }&date=${new Date().getDate()}-${
             new Date().getMonth() + 1
           }-${new Date().getFullYear()}`
         )
@@ -157,94 +300,81 @@ function App() {
             const temp = resp.centers.filter((center: any) => {
               let retVal = false;
               for (const ses of center.sessions) {
-                if (parseInt(ses.min_age_limit) < 45) {
+                if (parseInt(ses.available_capacity) > 0) {
                   retVal = true;
                   break;
                 }
               }
               return retVal;
             });
-            dispatch({ type: "setglb", payload: temp });
-            res("success");
-          });
-      })
-    );
-
-    prom.push(
-      new Promise((res) => {
-        fetch(
-          `https://cdn-api.co-vin.in/api/v2/appointment/sessions/public/calendarByDistrict?district_id=294&date=${new Date().getDate()}-${
-            new Date().getMonth() + 1
-          }-${new Date().getFullYear()}`
-        )
-          .then((resp) => resp.json())
-          .then((resp) => {
-            const temp = resp.centers.filter((center: any) => {
+            const temp18Dose1 = resp.centers.filter((center: any) => {
               let retVal = false;
               for (const ses of center.sessions) {
-                if (parseInt(ses.min_age_limit) < 45) {
+                if (
+                  parseInt(ses.min_age_limit) < 40 &&
+                  parseInt(ses.available_capacity_dose1) > 0
+                ) {
                   retVal = true;
                   break;
                 }
               }
               return retVal;
             });
-            dispatch({ type: "setbbmp", payload: temp });
-            res("success");
-          });
-      })
-    );
-
-    prom.push(
-      new Promise((res) => {
-        fetch(
-          `https://cdn-api.co-vin.in/api/v2/appointment/sessions/public/calendarByDistrict?district_id=571&date=${new Date().getDate()}-${
-            new Date().getMonth() + 1
-          }-${new Date().getFullYear()}`
-        )
-          .then((resp) => resp.json())
-          .then((resp) => {
-            const temp = resp.centers.filter((center: any) => {
+            const temp18Dose2 = resp.centers.filter((center: any) => {
               let retVal = false;
               for (const ses of center.sessions) {
-                if (parseInt(ses.min_age_limit) < 45) {
+                if (
+                  parseInt(ses.min_age_limit) < 40 &&
+                  parseInt(ses.available_capacity_dose2) > 0
+                ) {
                   retVal = true;
                   break;
                 }
               }
               return retVal;
             });
-            dispatch({ type: "setchennai", payload: temp });
-            res("success");
-          });
-      })
-    );
-
-    prom.push(
-      new Promise((res) => {
-        fetch(
-          `https://cdn-api.co-vin.in/api/v2/appointment/sessions/public/calendarByDistrict?district_id=581&date=${new Date().getDate()}-${
-            new Date().getMonth() + 1
-          }-${new Date().getFullYear()}`
-        )
-          .then((resp) => resp.json())
-          .then((resp) => {
-            const temp = resp.centers.filter((center: any) => {
+            const temp45Dose1 = resp.centers.filter((center: any) => {
               let retVal = false;
               for (const ses of center.sessions) {
-                if (parseInt(ses.min_age_limit) < 45) {
+                if (
+                  parseInt(ses.min_age_limit) > 40 &&
+                  parseInt(ses.available_capacity_dose1) > 0
+                ) {
                   retVal = true;
                   break;
                 }
               }
               return retVal;
             });
-            dispatch({ type: "sethyderabad", payload: temp });
+            const temp45Dose2 = resp.centers.filter((center: any) => {
+              let retVal = false;
+              for (const ses of center.sessions) {
+                if (
+                  parseInt(ses.min_age_limit) > 40 &&
+                  parseInt(ses.available_capacity_dose2) > 0
+                ) {
+                  retVal = true;
+                  break;
+                }
+              }
+              return retVal;
+            });
+            dispatch({
+              type: dist.dispatchType,
+              payload: temp,
+              payload18Dose1: temp18Dose1,
+              payload18Dose2: temp18Dose2,
+              payload45Dose1: temp45Dose1,
+              payload45Dose2: temp45Dose2,
+            });
+            dispatch({
+              type: "setfilter",
+              payload: "all",
+            });
             res("success");
           });
-      })
-    );
-
+      });
+    });
     Promise.all(prom).then(() => {
       setTimeout(() => {
         dispatch({ type: "setLoading", payload: false });
@@ -275,12 +405,20 @@ function App() {
       </header>
       <div className="wrap bg-gray-700">
         <div className="medwrap md:max-w-5xl mx-auto text-left overflow-y-auto">
-          <div className="tabroot bg-gray-700 items-center flex gap-4 p-4">
-            {["BBMP", "Gulbarga", "Chennai", "Hyderabad"].map((d) => (
+          <div className="tabroot bg-gray-700 items-center flex flex-wrap gap-6 px-4 pt-4 pb-2">
+            {[
+              "BBMP",
+              "Gulbarga",
+              "Chennai",
+              "Hyderabad",
+              "Pune",
+              "Mumbai",
+              "Thane",
+            ].map((d) => (
               <button
                 key={d}
                 className={clsx({
-                  ["focus:outline-none hover:text-gray-100 text-gray-400 text-sm"]:
+                  ["focus:outline-none hover:text-gray-100 text-gray-300 text-sm"]:
                     true,
                   ["underline"]: states.activeWard == d,
                 })}
@@ -289,12 +427,55 @@ function App() {
                 {d}
               </button>
             ))}
+          </div>
+          <div className="tabroot bg-gray-700 items-center flex gap-4 px-4 pb-4">
             <button
               className="focus:outline-none hover:text-gray-100 text-gray-400 text-sm ml-auto"
               onClick={() => LoadData()}
             >
               Refresh
             </button>
+          </div>
+          <div className="radiogroup flex flex-wrap px-4 gap-4 text-gray-400 items-center">
+            {[
+              {
+                label: "All",
+                id: "all",
+              },
+              {
+                label: "18+ (1st Dose)",
+                id: "18A",
+              },
+              {
+                label: "18+ (2nd Dose)",
+                id: "18B",
+              },
+              {
+                label: "45+ (1st Dose)",
+                id: "45A",
+              },
+              {
+                label: "45+ (2nd Dose)",
+                id: "45B",
+              },
+            ].map((rad: any) => (
+              <div className="task">
+                <input
+                  type="radio"
+                  id={rad.id}
+                  value={rad.id}
+                  name="filter"
+                  checked={states.activeFilter == rad.id}
+                  onChange={() =>
+                    dispatch({ type: "setfilter", payload: rad.id })
+                  }
+                />
+                <label htmlFor={rad.id}>
+                  <span className="custom-checkbox"></span>
+                  <span className="text-sm">{rad.label}</span>
+                </label>
+              </div>
+            ))}
           </div>
         </div>
         {getActiveComp(states)}

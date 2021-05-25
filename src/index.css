@@ -11,6 +11,8 @@ body {
   font-family: "Ubuntu Mono", monospace;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  background: rgba(55, 65, 81);
+  overflow: hidden;
   /* width */
 }
 ::-webkit-scrollbar {
@@ -19,7 +21,7 @@ body {
 
 /* Track */
 ::-webkit-scrollbar-track {
-  background: #f1f1f1;
+  background: rgba(55, 65, 81);
 }
 
 /* Handle */
@@ -35,4 +37,37 @@ body {
 code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New",
     monospace;
+}
+
+.custom-checkbox {
+  --size: 0.75em;
+  display: inline-block;
+  width: var(--size);
+  height: var(--size);
+  margin-right: var(--size);
+  cursor: pointer;
+  border: 2px solid currentColor;
+  border-radius: 50%;
+}
+[type="radio"] {
+  display: none;
+}
+
+.task:hover .custom-checkbox,
+[type="radio"]:focus + label .custom-checkbox {
+  color: #ddd;
+}
+
+[type="radio"]:checked + label .custom-checkbox {
+  background: #fff;
+  border-color: rgba(243, 244, 246);
+  box-shadow: inset 0 0 0px 2px transparent;
+}
+
+/* [type="radio"]:checked + label {
+  opacity: 0.5;
+} */
+
+.centers {
+  max-height: 75vh;
 }
