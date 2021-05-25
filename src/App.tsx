@@ -156,7 +156,7 @@ const Slots: React.FC<any> = ({ state, isLoading }) => {
   ) : (
     <div className="medwrap md:max-w-5xl mx-auto text-left">
       <main className="bg-gray-700 text-left px-4 my-4 overflow-y-auto">
-        <div className="text-3xl font-bold sticky top-0 bg-gray-700 text-gray-400 border-b-2 pb-1 mb-3 border-gray-600">
+        <div className="text-3xl font-bold bg-gray-700 text-gray-400 border-b-2 pb-1 mb-3 border-gray-600">
           {state.name}
         </div>
         <div className="centers">

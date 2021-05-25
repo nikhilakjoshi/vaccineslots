@@ -12,7 +12,6 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   background: rgba(55, 65, 81);
-  overflow: hidden;
   /* width */
 }
 ::-webkit-scrollbar {
@@ -67,7 +66,3 @@ code {
 /* [type="radio"]:checked + label {
   opacity: 0.5;
 } */
-
-.centers {
-  max-height: 75vh;
-}
