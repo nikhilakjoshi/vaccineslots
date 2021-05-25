@@ -504,7 +504,7 @@ function App() {
             document.body.scrollTop = 0;
             document.documentElement.scrollTop = 0;
           }}
-          className="totop text-gray-50 fixed text-xs p-0 bottom-2 right-2 cursor-pointer shadow-xl focus:outline-none bg-gray-500 px-4 py-1"
+          className="totop text-gray-50 fixed text-xs p-0 bottom-10 right-2 cursor-pointer shadow-xl focus:outline-none bg-gray-500 px-4 py-1"
         >
           Back to Top
         </button>
