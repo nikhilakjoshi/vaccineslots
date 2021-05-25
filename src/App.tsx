@@ -32,6 +32,7 @@ const initialState = {
   activeWard: "BBMP",
   isLoading: true,
   activeFilter: "all",
+  isToTop: false,
 };
 const reducer = (currState: any, action: any) => {
   switch (action.type) {
@@ -142,6 +143,12 @@ const reducer = (currState: any, action: any) => {
       return {
         ...currState,
         activeFilter: action.payload,
+      };
+    }
+    case "setToTop": {
+      return {
+        ...currState,
+        isToTop: action.payload,
       };
     }
 
@@ -384,6 +391,17 @@ function App() {
 
   useEffect(() => {
     LoadData();
+    const scrollFunction = () => {
+      if (
+        document.body.scrollTop > 20 ||
+        document.documentElement.scrollTop > 200
+      ) {
+        dispatch({ type: "setToTop", payload: true });
+      } else {
+        dispatch({ type: "setToTop", payload: false });
+      }
+    };
+    window.addEventListener("scroll", scrollFunction);
   }, []);
 
   return (
@@ -459,7 +477,7 @@ function App() {
                 id: "45B",
               },
             ].map((rad: any) => (
-              <div className="task">
+              <div key={rad.id} className="task">
                 <input
                   type="radio"
                   id={rad.id}
@@ -480,6 +498,17 @@ function App() {
         </div>
         {getActiveComp(states)}
       </div>
+      {states.isToTop && (
+        <button
+          onClick={() => {
+            document.body.scrollTop = 0;
+            document.documentElement.scrollTop = 0;
+          }}
+          className="totop text-gray-50 fixed text-xs p-0 bottom-2 right-2 cursor-pointer shadow-xl focus:outline-none bg-gray-500 px-4 py-1"
+        >
+          Back to Top
+        </button>
+      )}
     </div>
   );
 }
