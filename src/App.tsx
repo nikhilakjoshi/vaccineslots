@@ -1,10 +1,24 @@
-import React, { useEffect, useCallback, useReducer } from "react";
+import React, {
+  useState,
+  useEffect,
+  useCallback,
+  useReducer,
+  useMemo,
+} from "react";
 import "./App.css";
 import ruppee from "./ruppee.svg";
 import git from "./git.svg";
 import clsx from "clsx";
+import {
+  // init,
+  allDistricts,
+} from "./temputils";
 
 const initialState = {
+  Selected: {
+    name: "",
+    centers: [],
+  },
   Gulbarga: {
     name: "Gulbarga",
     centers: [],
@@ -34,8 +48,22 @@ const initialState = {
   activeFilter: "all",
   isToTop: false,
 };
+let timerId: number;
 const reducer = (currState: any, action: any) => {
   switch (action.type) {
+    case "setSelcted": {
+      return {
+        ...currState,
+        Selected: {
+          name: action.selname,
+          centers: [...action.payload],
+          centers18A: [...action.payload18Dose1],
+          centers18B: [...action.payload18Dose2],
+          centers45A: [...action.payload45Dose1],
+          centers45B: [...action.payload45Dose2],
+        },
+      };
+    }
     case "setglb": {
       return {
         ...currState,
@@ -404,12 +432,115 @@ function App() {
     window.addEventListener("scroll", scrollFunction);
   }, []);
 
+  const [districtInput, setdistrictInput] = useState("");
+  const [districtInputDebounce, setdistrictInputDebounce] = useState("");
+
+  const handleDistrictChange = (e: any) => {
+    setdistrictInput(e.target.value);
+    clearTimeout(timerId);
+    timerId = setTimeout(() => {
+      setdistrictInputDebounce(e.target.value);
+    }, 500);
+  };
+
+  const handleCityClick = useCallback((district_id, selname) => {
+    setdistrictInput(selname);
+    dispatch({ type: "setLoading", payload: true });
+    fetch(
+      `https://cdn-api.co-vin.in/api/v2/appointment/sessions/public/calendarByDistrict?district_id=${district_id}&date=${new Date().getDate()}-${
+        new Date().getMonth() + 1
+      }-${new Date().getFullYear()}`
+    )
+      .then((resp) => resp.json())
+      .then((resp) => {
+        const temp = resp.centers.filter((center: any) => {
+          let retVal = false;
+          for (const ses of center.sessions) {
+            if (parseInt(ses.available_capacity) > 0) {
+              retVal = true;
+              break;
+            }
+          }
+          return retVal;
+        });
+        const temp18Dose1 = resp.centers.filter((center: any) => {
+          let retVal = false;
+          for (const ses of center.sessions) {
+            if (
+              parseInt(ses.min_age_limit) < 40 &&
+              parseInt(ses.available_capacity_dose1) > 0
+            ) {
+              retVal = true;
+              break;
+            }
+          }
+          return retVal;
+        });
+        const temp18Dose2 = resp.centers.filter((center: any) => {
+          let retVal = false;
+          for (const ses of center.sessions) {
+            if (
+              parseInt(ses.min_age_limit) < 40 &&
+              parseInt(ses.available_capacity_dose2) > 0
+            ) {
+              retVal = true;
+              break;
+            }
+          }
+          return retVal;
+        });
+        const temp45Dose1 = resp.centers.filter((center: any) => {
+          let retVal = false;
+          for (const ses of center.sessions) {
+            if (
+              parseInt(ses.min_age_limit) > 40 &&
+              parseInt(ses.available_capacity_dose1) > 0
+            ) {
+              retVal = true;
+              break;
+            }
+          }
+          return retVal;
+        });
+        const temp45Dose2 = resp.centers.filter((center: any) => {
+          let retVal = false;
+          for (const ses of center.sessions) {
+            if (
+              parseInt(ses.min_age_limit) > 40 &&
+              parseInt(ses.available_capacity_dose2) > 0
+            ) {
+              retVal = true;
+              break;
+            }
+          }
+          return retVal;
+        });
+        dispatch({
+          type: "setSelcted",
+          selname,
+          payload: temp,
+          payload18Dose1: temp18Dose1,
+          payload18Dose2: temp18Dose2,
+          payload45Dose1: temp45Dose1,
+          payload45Dose2: temp45Dose2,
+        });
+        dispatch({
+          type: "setfilter",
+          payload: "all",
+        });
+        setdistrictInputDebounce("");
+        dispatch({ type: "setactiveward", payload: "Selected" });
+        dispatch({ type: "setLoading", payload: false });
+      });
+  }, []);
+
   return (
     <div className="App mx-auto">
-      <header className="bg-gray-900 sticky top-0 w-full font-bold text-gray-400 text-xl h-16 flex justify-start items-center border-gray-400 border-b">
+      <header className="bg-gray-900 sticky z-50 top-0 w-full font-bold text-gray-400 text-xl h-16 flex justify-start items-center border-gray-400 border-b">
         <div className="medwrap bg-gray-900 md:max-w-5xl w-full mx-auto text-left px-4">
           <div className="toproot flex justify-between items-center">
             <h6>Vaccination slots</h6>
+            {/* <button onClick={() => init()}>Init</button> */}
             <div className="icos">
               <a
                 href="https://github.com/nikhilakjoshi/vaccineslots"
@@ -422,8 +553,8 @@ function App() {
         </div>
       </header>
       <div className="wrap bg-gray-700">
-        <div className="medwrap md:max-w-5xl mx-auto text-left overflow-y-auto">
-          <div className="tabroot bg-gray-700 items-center flex flex-wrap gap-6 px-4 pt-4 pb-2">
+        <div className="medwrap md:max-w-5xl mx-auto text-left">
+          <div className="tabroot text-gray-500 bg-gray-700 items-center flex flex-wrap gap-6 px-4 pt-4 pb-2">
             {[
               "BBMP",
               "Gulbarga",
@@ -436,17 +567,46 @@ function App() {
               <button
                 key={d}
                 className={clsx({
-                  ["focus:outline-none hover:text-gray-100 text-gray-300 text-sm"]:
-                    true,
-                  ["underline"]: states.activeWard == d,
+                  ["text-gray-100 underline"]: states.activeWard == d,
+                  ["focus:outline-none hover:text-gray-100 text-sm"]: true,
                 })}
-                onClick={() => dispatch({ type: "setactiveward", payload: d })}
+                onClick={() => {
+                  setdistrictInput("");
+                  setdistrictInputDebounce("");
+                  dispatch({ type: "setactiveward", payload: d });
+                }}
               >
                 {d}
               </button>
             ))}
           </div>
-          <div className="tabroot bg-gray-700 items-center flex gap-4 px-4 pb-4">
+          <div className="tabroot bg-gray-700 items-center flex gap-4 m-4">
+            <div className="relative z-0 w-full">
+              <input
+                value={districtInput}
+                onChange={handleDistrictChange}
+                placeholder="Select district/ city..."
+                className="bg-gray-900 z-0 text-gray-300 px-2 py-1 text-sm focus:outline-none w-full placeholder-gray-600 rounded"
+              />
+              {districtInput !== "" ? (
+                <div
+                  onClick={() => {
+                    setdistrictInput("");
+                    setdistrictInputDebounce("");
+                    dispatch({ type: "setactiveward", payload: "BBMP" });
+                  }}
+                  className="clear absolute right-2 text-gray-400 top-0 cursor-pointer"
+                >
+                  x
+                </div>
+              ) : null}
+              {districtInputDebounce !== "" ? (
+                <DropDownDistricts
+                  filterText={districtInputDebounce}
+                  handleCityClick={handleCityClick}
+                />
+              ) : null}
+            </div>
             <button
               className="focus:outline-none hover:text-gray-100 text-gray-400 text-sm ml-auto"
               onClick={() => LoadData()}
@@ -512,5 +672,48 @@ function App() {
     </div>
   );
 }
+
+const filallDistrictsFunc = (filterText: string) => {
+  return allDistricts.filter((dist) => {
+    let retVal = false;
+    if (filterText !== "") {
+      dist.district_name.toLowerCase().search(filterText.toLowerCase()) > -1
+        ? (retVal = true)
+        : (retVal = false);
+    } else {
+      retVal = true;
+    }
+    return retVal;
+  });
+};
+
+const DropDownDistricts: React.FC<any> = ({ filterText, handleCityClick }) => {
+  const filallDistricts = useMemo(
+    () => filallDistrictsFunc(filterText),
+    [filterText]
+  );
+
+  return (
+    <div className="root absolute max-h-96 w-5/6 overflow-y-auto z-20 top-8 bg-gray-400 py-1 rounded">
+      {filallDistricts.length > 0 ? (
+        filallDistricts.map((district) => (
+          <div
+            key={district.district_id}
+            onClick={() =>
+              handleCityClick(district.district_id, district.district_name)
+            }
+            className="distroot text-gray-700 my-1 px-1 hover:bg-gray-500 cursor-pointer"
+          >
+            {district.district_name}
+          </div>
+        ))
+      ) : (
+        <div className="distroot text-gray-500 italic my-1 px-1 text-sm">
+          No districts/ cities with provided input
+        </div>
+      )}
+    </div>
+  );
+};
 
 export default App;
