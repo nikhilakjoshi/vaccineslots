@@ -41,6 +41,42 @@ const getDistrictsAndAppendtoJson = (stateObj: any) => {
     });
 };
 
+export const initialState = {
+  Selected: {
+    name: "",
+    centers: [],
+  },
+  Gulbarga: {
+    name: "Gulbarga",
+    centers: [],
+  },
+  BBMP: {
+    name: "BBMP",
+    centers: [],
+  },
+  Chennai: {
+    name: "Chennai",
+    centers: [],
+  },
+  Pune: {
+    name: "Pune",
+    centers: [],
+  },
+  Mumbai: {
+    name: "Mumbai",
+    centers: [],
+  },
+  Thane: {
+    name: "Thane",
+    centers: [],
+  },
+  activeWard: "BBMP",
+  isLoading: true,
+  activeFilter: "all",
+  isToTop: false,
+  isDark: false,
+};
+
 export const allDistricts = [
   {
     district_id: 9,
