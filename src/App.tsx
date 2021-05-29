@@ -595,7 +595,7 @@ function App() {
                     setdistrictInputDebounce("");
                     dispatch({ type: "setactiveward", payload: "BBMP" });
                   }}
-                  className="clear absolute right-2 text-gray-400 top-0 cursor-pointer"
+                  className="clear absolute right-2 text-gray-400 top-0 cursor-pointer pl-6"
                 >
                   x
                 </div>
