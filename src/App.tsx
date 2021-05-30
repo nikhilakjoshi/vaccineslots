@@ -6,6 +6,7 @@ import React, {
   useMemo,
   createContext,
   useContext,
+  useRef,
 } from "react";
 import "./App.css";
 import gitdark from "./git.svg";
@@ -17,32 +18,46 @@ import { allDistricts, initialState } from "./temputils";
 import { reducer } from "./reducer";
 import Slots from "./Slots";
 let timerId: number;
+import { motion, AnimatePresence } from "framer-motion";
+import { ReactSVG } from "react-svg";
 
 const getActiveComp = (state: any) => {
   switch (state.activeWard) {
     default:
       return (
-        <Slots
-          state={{
-            ...state[state.activeWard],
-            centers:
-              state.activeFilter == "all"
-                ? state[state.activeWard].centers
-                : state.activeFilter == "18A"
-                ? state[state.activeWard].centers18A
-                : state.activeFilter == "18B"
-                ? state[state.activeWard].centers18B
-                : state.activeFilter == "45A"
-                ? state[state.activeWard].centers45A
-                : state[state.activeWard].centers45B,
-          }}
-          isLoading={state.isLoading}
-        />
+        <AnimatePresence>
+          <Slots
+            state={{
+              ...state[state.activeWard],
+              centers:
+                state.activeFilter == "all"
+                  ? state[state.activeWard].centers
+                  : state.activeFilter == "18A"
+                  ? state[state.activeWard].centers18A
+                  : state.activeFilter == "18B"
+                  ? state[state.activeWard].centers18B
+                  : state.activeFilter == "45A"
+                  ? state[state.activeWard].centers45A
+                  : state[state.activeWard].centers45B,
+              ckey:
+                state.activeFilter == "all"
+                  ? "All"
+                  : state.activeFilter == "18A"
+                  ? "18A"
+                  : state.activeFilter == "18B"
+                  ? "18B"
+                  : state.activeFilter == "45A"
+                  ? "45A"
+                  : "45B",
+            }}
+            isLoading={state.isLoading}
+          />
+        </AnimatePresence>
       );
   }
 };
 
-export const AppContext = createContext({});
+export const AppContext = createContext<any>({});
 
 function App() {
   const [states, dispatch] = useReducer(reducer, initialState);
@@ -198,6 +213,7 @@ function App() {
     setdistrictInput(e.target.value);
     clearTimeout(timerId);
     timerId = setTimeout(() => {
+      console.log(e.target.value);
       setdistrictInputDebounce(e.target.value);
     }, 500);
   };
@@ -329,17 +345,21 @@ function App() {
                   }
                   className="focus:outline-none"
                 >
-                  <img
-                    src={states.isDark ? turnon : turnoff}
-                    alt="toggle-mode"
-                    className="transition-all"
-                  />
+                  {states.isDark ? (
+                    <ReactSVG src={turnon} />
+                  ) : (
+                    <ReactSVG src={turnoff} />
+                  )}
                 </button>
                 <a
                   href="https://github.com/nikhilakjoshi/vaccineslots"
                   target="_blank"
                 >
-                  <img src={states.isDark ? gitdark : gitlight} alt="git" />
+                  {states.isDark ? (
+                    <ReactSVG src={gitdark} />
+                  ) : (
+                    <ReactSVG src={gitlight} />
+                  )}
                 </a>
               </div>
             </div>
@@ -392,13 +412,14 @@ function App() {
             <div
               // className="tabroot bg-gray-700 items-center flex gap-4 m-4"
               className={clsx({
-                ["items-center flex gap-4 m-4"]: true,
+                ["items-center flex gap-4 m-4 transition"]: true,
                 ["bg-gray-700"]: states.isDark,
                 ["bg-gray-300"]: !states.isDark,
               })}
             >
               <div className="relative z-0 w-full">
                 <input
+                  spellCheck={false}
                   value={districtInput}
                   onChange={handleDistrictChange}
                   placeholder="Select district/ city..."
@@ -430,17 +451,20 @@ function App() {
                     x
                   </div>
                 ) : null}
-                {districtInputDebounce !== "" ? (
-                  <DropDownDistricts
-                    filterText={districtInputDebounce}
-                    handleCityClick={handleCityClick}
-                  />
-                ) : null}
+                <AnimatePresence>
+                  {districtInputDebounce !== "" && (
+                    <DropDownDistricts
+                      filterText={districtInputDebounce}
+                      handleCityClick={handleCityClick}
+                      close={() => setdistrictInputDebounce("")}
+                    />
+                  )}
+                </AnimatePresence>
               </div>
               <button
                 // className="focus:outline-none hover:text-gray-100 text-gray-400 text-sm ml-auto"
                 className={clsx({
-                  ["focus:outline-none text-sm ml-auto"]: true,
+                  ["focus:outline-none text-sm ml-auto transition"]: true,
                   ["hover:text-gray-100 text-gray-400"]: states.isDark,
                   ["hover:text-gray-900 text-gray-600"]: !states.isDark,
                 })}
@@ -452,7 +476,8 @@ function App() {
             <div
               // className="radiogroup flex flex-wrap px-4 gap-4 text-gray-400 items-center"
               className={clsx({
-                ["radiogroup flex flex-wrap px-4 gap-4 items-center"]: true,
+                ["radiogroup flex flex-wrap px-4 gap-4 items-center transition"]:
+                  true,
                 ["text-gray-400"]: states.isDark,
                 ["text-gray-600"]: !states.isDark,
               })}
@@ -536,7 +561,11 @@ const filallDistrictsFunc = (filterText: string) => {
   });
 };
 
-const DropDownDistricts: React.FC<any> = ({ filterText, handleCityClick }) => {
+const DropDownDistricts: React.FC<any> = ({
+  filterText,
+  handleCityClick,
+  close,
+}) => {
   const filallDistricts = useMemo(
     () => filallDistrictsFunc(filterText),
     [filterText]
@@ -544,9 +573,36 @@ const DropDownDistricts: React.FC<any> = ({ filterText, handleCityClick }) => {
 
   const { states } = useContext<any>(AppContext);
 
+  const ref = useRef<any>(null);
+
+  useEffect(() => {
+    const handler = (e: any) => {
+      if (ref.current && !ref.current.contains(e.target)) {
+        close();
+      }
+    };
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, []);
+
   return (
-    <div
-      // className="root absolute max-h-96 w-5/6 overflow-y-auto z-20 top-8 bg-gray-400 py-1 rounded"
+    <motion.div
+      ref={ref}
+      initial={{
+        y: 5,
+        opacity: 0,
+      }}
+      // transition={{
+      //   duration: 0.2,
+      // }}
+      animate={{
+        y: 0,
+        opacity: 1,
+      }}
+      exit={{
+        y: 5,
+        opacity: 0,
+      }}
       className={clsx({
         ["root absolute max-h-96 w-5/6 overflow-y-auto z-20 top-8 py-1 rounded"]:
           true,
@@ -563,7 +619,7 @@ const DropDownDistricts: React.FC<any> = ({ filterText, handleCityClick }) => {
             }
             // className="distroot text-gray-700 my-1 px-1 hover:bg-gray-500 cursor-pointer"
             className={clsx({
-              ["distroot my-1 px-1 cursor-pointer"]: true,
+              ["distroot my-1 px-1 cursor-pointer transition"]: true,
               ["text-gray-700 hover:bg-gray-500"]: states.isDark,
               ["text-gray-300 hover:bg-gray-500"]: !states.isDark,
             })}
@@ -576,7 +632,7 @@ const DropDownDistricts: React.FC<any> = ({ filterText, handleCityClick }) => {
           No districts/ cities with provided input
         </div>
       )}
-    </div>
+    </motion.div>
   );
 };
 
