@@ -9,7 +9,7 @@ const Slots: React.FC<any> = ({ state, isLoading }) => {
     <motion.div
       animate={{ opacity: 1 }}
       initial={{ opacity: 0 }}
-      transition={{ duration: 0.5, type: "tween" }}
+      transition={{ duration: 0.15, type: "tween" }}
       exit={{ opacity: 0 }}
       key={`${state.ckey}_${state.name}`}
     >

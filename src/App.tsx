@@ -22,39 +22,37 @@ import { motion, AnimatePresence } from "framer-motion";
 import { ReactSVG } from "react-svg";
 
 const getActiveComp = (state: any) => {
-  switch (state.activeWard) {
-    default:
-      return (
-        <AnimatePresence>
-          <Slots
-            state={{
-              ...state[state.activeWard],
-              centers:
-                state.activeFilter == "all"
-                  ? state[state.activeWard].centers
-                  : state.activeFilter == "18A"
-                  ? state[state.activeWard].centers18A
-                  : state.activeFilter == "18B"
-                  ? state[state.activeWard].centers18B
-                  : state.activeFilter == "45A"
-                  ? state[state.activeWard].centers45A
-                  : state[state.activeWard].centers45B,
-              ckey:
-                state.activeFilter == "all"
-                  ? "All"
-                  : state.activeFilter == "18A"
-                  ? "18A"
-                  : state.activeFilter == "18B"
-                  ? "18B"
-                  : state.activeFilter == "45A"
-                  ? "45A"
-                  : "45B",
-            }}
-            isLoading={state.isLoading}
-          />
-        </AnimatePresence>
-      );
-  }
+  return (
+    <AnimatePresence exitBeforeEnter>
+      <Slots
+        state={{
+          ...state[state.activeWard],
+          centers:
+            state.activeFilter == "all"
+              ? state[state.activeWard].centers
+              : state.activeFilter == "18A"
+              ? state[state.activeWard].centers18A
+              : state.activeFilter == "18B"
+              ? state[state.activeWard].centers18B
+              : state.activeFilter == "45A"
+              ? state[state.activeWard].centers45A
+              : state[state.activeWard].centers45B,
+          ckey:
+            state.activeFilter == "all"
+              ? "All"
+              : state.activeFilter == "18A"
+              ? "18A"
+              : state.activeFilter == "18B"
+              ? "18B"
+              : state.activeFilter == "45A"
+              ? "45A"
+              : "45B",
+        }}
+        isLoading={state.isLoading}
+        key={`${state.activeWard}_${state.activeFilter}`}
+      />
+    </AnimatePresence>
+  );
 };
 
 export const AppContext = createContext<any>({});
@@ -355,36 +353,27 @@ function App() {
               </AnimatePresence>
               {/* <button onClick={() => init()}>Init</button> */}
               <div className="icos ml-auto flex items-center gap-4">
-                <button
-                  onClick={() =>
-                    dispatch({ type: "setDarkMode", payload: !states.isDark })
-                  }
-                  className="focus:outline-none"
-                >
-                  <AnimatePresence exitBeforeEnter>
-                    <motion.button
-                      onClick={() =>
-                        dispatch({
-                          type: "setDarkMode",
-                          payload: !states.isDark,
-                        })
-                      }
-                      key={states.isDark}
-                      className="focus:outline-none"
-                      animate={{ opacity: 1, y: 0 }}
-                      initial={{ opacity: 0, y: 5 }}
-                      transition={{
-                        duration: 0.5,
-                        type: "tween",
-                      }}
-                      exit={{ opacity: 0, y: 5 }}
-                    >
-                      <div>
-                        <ReactSVG src={states.isDark ? turnon : turnoff} />
-                      </div>
-                    </motion.button>
-                  </AnimatePresence>
-                </button>
+                <AnimatePresence exitBeforeEnter>
+                  <motion.button
+                    onClick={() =>
+                      dispatch({
+                        type: "setDarkMode",
+                        payload: !states.isDark,
+                      })
+                    }
+                    key={states.isDark}
+                    className="focus:outline-none"
+                    animate={{ opacity: 1, y: 0 }}
+                    initial={{ opacity: 0, y: 5 }}
+                    transition={{
+                      duration: 0.5,
+                      type: "tween",
+                    }}
+                    exit={{ opacity: 0, y: 5 }}
+                  >
+                    <ReactSVG src={states.isDark ? turnon : turnoff} />
+                  </motion.button>
+                </AnimatePresence>
                 <a
                   href="https://github.com/nikhilakjoshi/vaccineslots"
                   target="_blank"
@@ -401,6 +390,7 @@ function App() {
         </header>
         <div
           className={clsx({
+            // ["transition"]: true,
             ["bg-gray-300"]: !states.isDark,
             ["bg-gray-700"]: states.isDark,
           })}
@@ -424,10 +414,8 @@ function App() {
                 <button
                   key={d}
                   className={clsx({
-                    ["text-gray-100 underline hover:text-gray-500"]:
-                      states.isDark,
-                    ["text-gray-900 underline hover:text-gray-500"]:
-                      !states.isDark,
+                    ["text-gray-100 hover:text-gray-500"]: states.isDark,
+                    ["text-gray-900 hover:text-gray-500"]: !states.isDark,
                     ["underline"]: states.activeWard == d,
                     ["focus:outline-none transition text-sm"]: true,
                   })}
@@ -444,8 +432,6 @@ function App() {
             <div
               className={clsx({
                 ["items-center flex gap-4 m-4 transition"]: true,
-                ["bg-gray-700"]: states.isDark,
-                ["bg-gray-300"]: !states.isDark,
               })}
             >
               <div className="relative z-0 w-full">
@@ -471,7 +457,7 @@ function App() {
                       dispatch({ type: "setactiveward", payload: "BBMP" });
                     }}
                     className={clsx({
-                      ["clear absolute right-2 top-0 cursor-pointer pl-6"]:
+                      ["clear absolute right-2 top-0 cursor-pointer pl-6 transition"]:
                         true,
                       ["text-gray-400"]: states.isDark,
                       ["text-gray-600"]: !states.isDark,
