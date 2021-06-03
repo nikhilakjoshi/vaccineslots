@@ -335,21 +335,55 @@ function App() {
               ["bg-gray-900"]: states.isDark,
             })}
           >
-            <div className="toproot flex justify-between items-center">
-              <h6>Vaccination slots</h6>
+            <div className="toproot flex items-center">
+              <h6 className="mr-4">{`Vaccination slots`}</h6>
+              <AnimatePresence>
+                {states.isToTop && (
+                  <motion.span
+                    animate={{ opacity: 1 }}
+                    initial={{ opacity: 0 }}
+                    transition={{ duration: 0.5, type: "tween" }}
+                    exit={{ opacity: 0 }}
+                  >
+                    (
+                    {states.activeWard != "Selected"
+                      ? states.activeWard
+                      : states.Selected.name}
+                    )
+                  </motion.span>
+                )}
+              </AnimatePresence>
               {/* <button onClick={() => init()}>Init</button> */}
-              <div className="icos flex items-center gap-4">
+              <div className="icos ml-auto flex items-center gap-4">
                 <button
                   onClick={() =>
                     dispatch({ type: "setDarkMode", payload: !states.isDark })
                   }
                   className="focus:outline-none"
                 >
-                  {states.isDark ? (
-                    <ReactSVG src={turnon} />
-                  ) : (
-                    <ReactSVG src={turnoff} />
-                  )}
+                  <AnimatePresence exitBeforeEnter>
+                    <motion.button
+                      onClick={() =>
+                        dispatch({
+                          type: "setDarkMode",
+                          payload: !states.isDark,
+                        })
+                      }
+                      key={states.isDark}
+                      className="focus:outline-none"
+                      animate={{ opacity: 1, y: 0 }}
+                      initial={{ opacity: 0, y: 5 }}
+                      transition={{
+                        duration: 0.5,
+                        type: "tween",
+                      }}
+                      exit={{ opacity: 0, y: 5 }}
+                    >
+                      <div>
+                        <ReactSVG src={states.isDark ? turnon : turnoff} />
+                      </div>
+                    </motion.button>
+                  </AnimatePresence>
                 </button>
                 <a
                   href="https://github.com/nikhilakjoshi/vaccineslots"
@@ -373,12 +407,9 @@ function App() {
         >
           <div className="medwrap md:max-w-5xl mx-auto text-left">
             <div
-              // className="tabroot text-gray-500 bg-gray-700 items-center flex flex-wrap gap-6 px-4 pt-4 pb-2"
               className={clsx({
                 ["transition tabroot items-center flex flex-wrap gap-6 px-4 pt-4 pb-2"]:
                   true,
-                // ["text-gray-500 "]: !states.isDark,
-                // ["text-gray-500 "]: states.isDark,
               })}
             >
               {[
@@ -393,10 +424,11 @@ function App() {
                 <button
                   key={d}
                   className={clsx({
-                    ["text-gray-100 underline hover:text-gray-900"]:
-                      states.activeWard == d && states.isDark,
-                    ["text-gray-900 underline hover:text-gray-100"]:
-                      states.activeWard == d && !states.isDark,
+                    ["text-gray-100 underline hover:text-gray-500"]:
+                      states.isDark,
+                    ["text-gray-900 underline hover:text-gray-500"]:
+                      !states.isDark,
+                    ["underline"]: states.activeWard == d,
                     ["focus:outline-none transition text-sm"]: true,
                   })}
                   onClick={() => {
@@ -410,7 +442,6 @@ function App() {
               ))}
             </div>
             <div
-              // className="tabroot bg-gray-700 items-center flex gap-4 m-4"
               className={clsx({
                 ["items-center flex gap-4 m-4 transition"]: true,
                 ["bg-gray-700"]: states.isDark,
@@ -423,7 +454,6 @@ function App() {
                   value={districtInput}
                   onChange={handleDistrictChange}
                   placeholder="Select district/ city..."
-                  // className="bg-gray-900 z-0 text-gray-300 px-2 py-1 text-sm focus:outline-none w-full placeholder-gray-600 rounded"
                   className={clsx({
                     ["z-0 px-2 py-1 text-sm focus:outline-none w-full rounded"]:
                       true,
@@ -440,7 +470,6 @@ function App() {
                       setdistrictInputDebounce("");
                       dispatch({ type: "setactiveward", payload: "BBMP" });
                     }}
-                    // className="clear absolute right-2 text-gray-400 top-0 cursor-pointer pl-6"
                     className={clsx({
                       ["clear absolute right-2 top-0 cursor-pointer pl-6"]:
                         true,
@@ -462,7 +491,6 @@ function App() {
                 </AnimatePresence>
               </div>
               <button
-                // className="focus:outline-none hover:text-gray-100 text-gray-400 text-sm ml-auto"
                 className={clsx({
                   ["focus:outline-none text-sm ml-auto transition"]: true,
                   ["hover:text-gray-100 text-gray-400"]: states.isDark,
@@ -474,7 +502,6 @@ function App() {
               </button>
             </div>
             <div
-              // className="radiogroup flex flex-wrap px-4 gap-4 text-gray-400 items-center"
               className={clsx({
                 ["radiogroup flex flex-wrap px-4 gap-4 items-center transition"]:
                   true,
@@ -531,7 +558,6 @@ function App() {
               document.body.scrollTop = 0;
               document.documentElement.scrollTop = 0;
             }}
-            // className="totop text-gray-50 fixed text-xs p-0 bottom-10 right-2 cursor-pointer shadow-xl focus:outline-none bg-gray-500 px-4 py-1"
             className={clsx({
               ["totop  fixed text-xs p-0 bottom-10 right-2 cursor-pointer shadow-xl focus:outline-none px-4 py-1"]:
                 true,
@@ -592,9 +618,6 @@ const DropDownDistricts: React.FC<any> = ({
         y: 5,
         opacity: 0,
       }}
-      // transition={{
-      //   duration: 0.2,
-      // }}
       animate={{
         y: 0,
         opacity: 1,
@@ -617,7 +640,6 @@ const DropDownDistricts: React.FC<any> = ({
             onClick={() =>
               handleCityClick(district.district_id, district.district_name)
             }
-            // className="distroot text-gray-700 my-1 px-1 hover:bg-gray-500 cursor-pointer"
             className={clsx({
               ["distroot my-1 px-1 cursor-pointer transition"]: true,
               ["text-gray-700 hover:bg-gray-500"]: states.isDark,
